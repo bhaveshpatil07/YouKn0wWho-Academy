@@ -1,0 +1,28 @@
+:root {
+  --dark-shade-1: #282828;
+  --dark-shade-2: #404040;
+  --dark-shade-3: #595959;
+  --dark-shade-4: #737373;
+  --dark-shade-5: #8c8c8c;
+}
+/* ===== Scrollbar CSS ===== */
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #2e89c2 #adc3d1;
+}
+
+/* Chrome, Edge, and Safari */
+*::-webkit-scrollbar {
+  width: 2px;
+}
+
+*::-webkit-scrollbar-track {
+  background: #adc3d1;
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: #2e89c2;
+  border-radius: 61px;
+  border: 5px groove #ff0000;
+}
