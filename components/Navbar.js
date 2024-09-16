@@ -44,7 +44,7 @@ export default function Navbar() {
   const navigate = (path) => Router.push(path);
   return (
     mounted && (
-      <Box p={2} bg="transparent">
+      <Box p={isMobile ? 1:3} bg="transparent">
         <Box
           maxW="7xl"
           mx="auto"

@@ -64,7 +64,7 @@ import {
 import NProgress from "nprogress";
 import { GrResources } from "react-icons/gr";
 import { FaAlignLeft } from "react-icons/fa";
-import { getSolvedProblemsByTopic, useTopicListColorMode } from "../lib/hooks";
+import { getSolvedProblemsByTopic, useAuth, useTopicListColorMode } from "../lib/hooks";
 import instance from "../utils/api";
 import toast from "react-hot-toast";
 
@@ -161,6 +161,7 @@ const LoadingSkeleton = ({ colorMode }) => (
 const TopicData = () => {
   const router = useRouter();
   const { topic_id } = router.query;
+  const isLoggedIn = useAuth();
 
 
   const [colorMode, toggleColorMode] = useTopicListColorMode();
@@ -611,6 +612,12 @@ const TopicData = () => {
                         {problems.map((problem, index) => {
                           const isChecked = completedProblems[problem.problem_id];
                           const topicCompleted = async (check) => {
+                            if(!isLoggedIn){
+                              toast.error(
+                                `Please login to mark problem as solved!`
+                              );
+                              return;
+                            }
                             setSolvedProblems([...solvedProblems, problem.problem_id]);
                             if (!check) {
                               await instance.delete("/progress/problems", {data: { topicId: topic_id, problems: [problem.problem_id] }}).then((resp) => {

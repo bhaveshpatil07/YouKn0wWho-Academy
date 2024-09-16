@@ -766,6 +766,7 @@ const TopicAccordion = React.memo(
     completedTopics
   }) => {
     // console.log(completedTopics);
+  const isLoggedIn = useAuth();
 
 
     return (
@@ -871,6 +872,12 @@ const TopicAccordion = React.memo(
                   const isChecked = completedTopics[topic.topic_id];
                   const [isLoading, setIsLoading] = useState(false);
                   const topicCompleted = async (check) => {
+                    if(!isLoggedIn){
+                      toast.error(
+                        `Please login to mark topic as completed!`
+                      );
+                      return;
+                    }
                     completedTopics[topic.topic_id] = check;
                     setIsLoading(true);
                     if (!check) {
