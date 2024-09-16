@@ -472,6 +472,7 @@ export default function TopicList() {
                   activeIndices={activeIndices}
                   isLightMode={isLightMode}
                   completedTopics={completedTopics}
+                  isLoggedIn={isLoggedIn}
                 />
               ) : null}
             </AccordionItem>
@@ -763,10 +764,10 @@ const TopicAccordion = React.memo(
     matchesFilters,
     activeIndices, // to check if this category is under active indices
     isLightMode,
-    completedTopics
+    completedTopics,
+    isLoggedIn
   }) => {
     // console.log(completedTopics);
-  const isLoggedIn = useAuth();
 
 
     return (
@@ -872,9 +873,9 @@ const TopicAccordion = React.memo(
                   const isChecked = completedTopics[topic.topic_id];
                   const [isLoading, setIsLoading] = useState(false);
                   const topicCompleted = async (check) => {
-                    if(!isLoggedIn){
+                    if(!isLoggedIn) {
                       toast.error(
-                        `Please login to mark topic as completed!`
+                        `Please login to mark topic as completed.`
                       );
                       return;
                     }
