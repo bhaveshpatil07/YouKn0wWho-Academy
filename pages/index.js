@@ -47,7 +47,7 @@ import {
   getTopicDifficultyTitle,
   renderImportanceStars,
 } from "../utils/topicList";
-import { useTopicListColorMode, useAuth, getCompletedProblems } from "../lib/hooks";
+import { useTopicListColorMode, useAuth, getCompletedProblems, getLatestCompletedProblems } from "../lib/hooks";
 import instance from "../utils/api";
 
 const getTopicIndex = (topic_id) => {
@@ -103,6 +103,15 @@ export default function TopicList() {
   );
 
   const totalTopicListProblems = Object.keys(topicListProblems).length;
+
+
+  useEffect(() => {
+    return () => {
+      if (isLoggedIn) {
+        getLatestCompletedProblems();
+      }
+    }
+  }, [isLoggedIn]);
 
   useEffect(() => {
     if (router.query.topic) {
@@ -873,7 +882,7 @@ const TopicAccordion = React.memo(
                   const isChecked = completedTopics[topic.topic_id];
                   const [isLoading, setIsLoading] = useState(false);
                   const topicCompleted = async (check) => {
-                    if(!isLoggedIn) {
+                    if (!isLoggedIn) {
                       toast.error(
                         `Please login to mark topic as completed.`
                       );
@@ -882,7 +891,7 @@ const TopicAccordion = React.memo(
                     completedTopics[topic.topic_id] = check;
                     setIsLoading(true);
                     if (!check) {
-                      await instance.delete("/progress", {data: { categoryId: category.category_id, subCategoryId: subCategory.sub_category_id, topicIds: [topic.topic_id] }}).then((resp) => {
+                      await instance.delete("/progress", { data: { categoryId: category.category_id, subCategoryId: subCategory.sub_category_id, topicIds: [topic.topic_id] } }).then((resp) => {
                         // console.log(resp.data);
                       }).catch((err) => {
                         toast.error(
