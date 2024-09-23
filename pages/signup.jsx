@@ -13,16 +13,18 @@ import {
     Text,
     useColorModeValue,
     useToast,
+    Divider,
 } from '@chakra-ui/react';
 import Link from "next/link";
 import { useEffect, useState } from 'react'
 import styles from "../styles/navbar.module.css";
-import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
 import { PiEyeDuotone, PiEyeSlashDuotone } from 'react-icons/pi';
 import { useRouter } from 'next/router';
-import { signUp, useAuth } from '../lib/hooks';
+import { signUp, socialLogIn, useAuth } from '../lib/hooks';
 import Head from 'next/head';
 import Loader from '../components/Loader';
+import { GoogleLogin, GoogleOAuthProvider } from "@react-oauth/google";
+import { jwtDecode } from "jwt-decode";
 
 export default function SignupCard() {
     const toast = useToast();
@@ -138,7 +140,7 @@ export default function SignupCard() {
                     content="A comprehensive list of topics in Competitive Programming. Signup and create your account to explore all cool features."
                 />
             </Head>
-            <Stack spacing={8} mx={'auto'} maxW={'lg'} py={12} px={6}>
+            <Stack spacing={8} mx={'auto'} maxW={'lg'} py={2} px={6}>
                 <Stack align={'center'}>
                     <Heading fontSize={'4xl'} textAlign={'center'}>
                         Sign up to create account
@@ -151,7 +153,76 @@ export default function SignupCard() {
                     rounded={'lg'}
                     bg={useColorModeValue('white', 'gray.700')}
                     boxShadow={'lg'}
-                    p={8}>
+                    px={8} py={4}>
+                    <Flex flexDirection={"column"} justifyContent={"center"} alignItems={"center"} mb={2} >
+                        <GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID}>
+                            <GoogleLogin
+                                theme="filled_blue"
+                                text="signup_with"
+                                shape="pill"
+                                onSuccess={async (credentialResponse) => {
+                                    const decoded = jwtDecode(credentialResponse?.credential);
+                                    // console.log(decoded);
+                                    if (decoded.email_verified) {
+                                        setIsLoading(true);
+                                        await socialLogIn(decoded.given_name, decoded.family_name, decoded.email, decoded.email).then((data) => {
+                                            if (data === 200) {
+                                                toast({
+                                                    title: "Login Successful",
+                                                    description: "Reset your password if you forgot it.",
+                                                    status: "success",
+                                                    duration: 2500,
+                                                    isClosable: true,
+                                                    position: "top",
+                                                });
+                                                setTimeout(() => {
+                                                    open('/', '_self');
+                                                }, 2500);
+                                            } else if (data === 201) {
+                                                toast({
+                                                    title: "SignUp Successful",
+                                                    description: "Your Password is your email address. Please change it ASAP.",
+                                                    status: "success",
+                                                    duration: 2500,
+                                                    isClosable: true,
+                                                    position: "top",
+                                                });
+                                                setTimeout(() => {
+                                                    open('/', '_self');
+                                                }, 2500);
+                                            }
+                                        }).catch((err) => {
+                                            // console.log(err);
+                                            toast({
+                                                title: err?.error,
+                                                description: "",
+                                                status: "error",
+                                                duration: 2500,
+                                                isClosable: true,
+                                                position: "top",
+                                            });
+                                        }).finally(() => {
+                                            setIsLoading(false);
+                                        });
+                                    } else {
+                                        toast({
+                                            title: "Email not verified",
+                                            description: "Please verify your email",
+                                            status: "warning",
+                                            duration: 2500,
+                                            isClosable: true,
+                                            position: "top",
+                                        });
+                                    }
+                                }}
+                                onError={() => {
+                                    console.log('SignUp Failed');
+                                }} />
+                        </GoogleOAuthProvider>
+                        <b style={{ color: "gray" }}>OR</b>
+                    </Flex>
+
+                    <Divider mb={3} style={{ width: "100%", height: "1px", backgroundColor: "gray" }} />
                     <Stack spacing={4}>
                         <HStack>
                             <Box>
@@ -206,6 +277,6 @@ export default function SignupCard() {
                     </Stack>
                 </Box>
             </Stack>
-        </Flex>
+        </Flex >
     )
 }

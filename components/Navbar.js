@@ -35,11 +35,6 @@ export default function Navbar() {
   const isLoggedIn = useAuth();
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
-  useEffect(() => {
-    if (isLoggedIn) {
-      getLatestCompletedProblems();
-    }
-  }, [isLoggedIn]);
 
   const navigate = (path) => Router.push(path);
   return (

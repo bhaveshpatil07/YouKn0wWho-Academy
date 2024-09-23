@@ -106,10 +106,8 @@ export default function TopicList() {
 
 
   useEffect(() => {
-    return () => {
-      if (isLoggedIn) {
-        getLatestCompletedProblems();
-      }
+    if (isLoggedIn) {
+      getLatestCompletedProblems();
     }
   }, [isLoggedIn]);
 

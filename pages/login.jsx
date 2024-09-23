@@ -13,15 +13,18 @@ import {
   InputGroup,
   InputRightElement,
   useToast,
+  Divider,
 } from '@chakra-ui/react';
 import Link from "next/link";
 import styles from "../styles/navbar.module.css";
 import { PiEyeDuotone, PiEyeSlashDuotone } from "react-icons/pi";
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
-import { logIn, useAuth } from '../lib/hooks';
+import { logIn, socialLogIn, useAuth } from '../lib/hooks';
 import Head from 'next/head';
 import Loader from '../components/Loader';
+import { GoogleLogin, GoogleOAuthProvider } from '@react-oauth/google';
+import { jwtDecode } from 'jwt-decode';
 
 export default function SimpleCard() {
   const toast = useToast();
@@ -67,7 +70,7 @@ export default function SimpleCard() {
         open('/', '_self');
       }).catch((err) => {
         // console.log(err);
-        
+
         toast({
           title: err.response?.data?.error,
           description: err.message,
@@ -76,7 +79,7 @@ export default function SimpleCard() {
           isClosable: true,
           position: "top",
         });
-        if(err.status === 404){
+        if (err.status === 404) {
           router.push('/signup');
         }
       }).finally(() => {
@@ -129,6 +132,72 @@ export default function SimpleCard() {
           bg={useColorModeValue('white', 'gray.700')}
           boxShadow={'lg'}
           p={8}>
+
+          <Flex flexDirection={"column"} justifyContent={"center"} alignItems={"center"} mb={2} >
+            <GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID}>
+              <GoogleLogin
+                theme="filled_blue"
+                text="signin_with"
+                shape="pill"
+                onSuccess={async (credentialResponse) => {
+                  const decoded = jwtDecode(credentialResponse?.credential);
+                  // console.log(decoded);
+                  if (decoded.email_verified) {
+                    setIsLoading(true);
+                    await socialLogIn(decoded.given_name, decoded.family_name, decoded.email, decoded.email).then((data) => {
+                      if (data === 200) {
+                        toast({
+                          title: "LogIn Successful",
+                          description: "Reset your Password if you forgot it",
+                          status: "success",
+                          duration: 2500,
+                          isClosable: true,
+                          position: "top",
+                        });
+                      }else if(data === 201){ 
+                        toast({
+                          title: "SignUp Successful",
+                          description: "Your Password is your email address. Please change it ASAP.",
+                          status: "success",
+                          duration: 2500,
+                          isClosable: true,
+                          position: "top",
+                        });
+                      }
+                      setTimeout(() => {
+                        open('/', '_self');
+                      }, 2000);
+                    }).catch((err) => {
+                      // console.log(err);
+                      toast({
+                        title: err?.error,
+                        description: "",
+                        status: "error",
+                        duration: 2500,
+                        isClosable: true,
+                        position: "top",
+                      });
+                    }).finally(() => {
+                      setIsLoading(false);
+                    });
+                  } else {
+                    toast({
+                      title: "Email not verified",
+                      description: "Please verify your email",
+                      status: "warning",
+                      duration: 2500,
+                      isClosable: true,
+                      position: "top",
+                    });
+                  }
+                }}
+                onError={() => {
+                  console.log('SignUp Failed');
+                }} />
+            </GoogleOAuthProvider>
+            <b style={{ color: "gray" }}>OR</b>
+          </Flex>
+          <Divider mb={3} style={{ width: "100%", height: "1px", backgroundColor: "gray" }} />
           <Stack spacing={4}>
             <FormControl id="email" isRequired>
               <FormLabel>Email address</FormLabel>

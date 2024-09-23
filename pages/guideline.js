@@ -62,7 +62,8 @@ const GuidelinePage = () => {
             will help you to start from scratch.
             <br />
             Also check this guideline:{" "}
-            <Box mr={2}>
+            <br />
+            <Box as="span" mr={2}>
               <Button
                 onClick={() =>
                   window.open(
@@ -82,7 +83,7 @@ const GuidelinePage = () => {
           <Heading size="md" my={2} mt={4}>
             If You are not a Beginner
           </Heading>
-          <Text fontSize="md" mb={2}>
+          <Text as={"span"} fontSize="md" mb={2}>
             If you already know the basics of programming, you can do the
             following:
             <br />
